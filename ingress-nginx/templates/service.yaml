@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ingress-nginx.fullname" . }}-controller
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/component: controller
+    {{- include "ingress-nginx.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - appProtocol: http
+      name: http
+      port: {{ .Values.service.port }}
+      protocol: TCP
+      targetPort: tohttps
+    - appProtocol: https
+      name: https
+      port: 443
+      protocol: TCP
+      targetPort: http
+  externalTrafficPolicy: Local
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
+  selector:
+    app.kubernetes.io/component: controller
+    {{- include "ingress-nginx.selectorLabels" . | nindent 4 }}

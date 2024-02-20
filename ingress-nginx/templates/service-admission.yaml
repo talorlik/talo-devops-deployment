@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ingress-nginx.fullname" . }}-controller-admission
+  namespace: ingress-nginx
+  labels:
+    app.kubernetes.io/component: admission-webhook
+    {{- include "ingress-nginx.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.serviceAdmission.type }}
+  ports:
+    - appProtocol: https
+      name: https-webhook
+      port: {{ .Values.serviceAdmission.port }}
+      targetPort: webhook
+  selector:
+    app.kubernetes.io/component: admission-webhook
+    {{- include "ingress-nginx.selectorLabels" . | nindent 4 }}
